@@ -13,8 +13,12 @@ func main() {
 	defer cancel()
 
 	types := discovery.DiscoverServiceTypes(ctx)
+	nodes := discovery.ScanAllServices(ctx, types)
 
-	for _, t := range types {
-		fmt.Println(t)
+	if len(nodes) == 0 {
+		fmt.Println("Empty nodes list")
+	}
+	for _, node := range nodes {
+		fmt.Printf("%+v\n", node)
 	}
 }
