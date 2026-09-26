@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/hashicorp/mdns"
 	"github.com/tg4-dev/air/src/internal/discovery"
 )
 
@@ -19,8 +20,23 @@ func main() {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
+	hostname, err := os.Hostname()
+	if err != nil {
+		log.Fatalf("Cannot get hostname: %s", err)
+	}
+
+	mdnsService, err := mdns.NewMDNSService(hostname, "_airnode._tcp", "", "", 12345, nil, []string{"info=test"})
+	if err != nil {
+		log.Fatalf("Cannot create mdnsService: %s", err)
+	}
+
 	isRunning := true
 
+	mdnsServer, err := mdns.NewServer(&mdns.Config{Zone: mdnsService})
+	if err != nil {
+		log.Fatalf("Cannot create mdnsServer: %s", err)
+	}
+	defer mdnsServer.Shutdown()
 	for isRunning {
 		select {
 		case <-sigs:
