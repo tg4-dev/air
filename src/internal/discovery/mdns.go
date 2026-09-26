@@ -9,6 +9,7 @@ import (
 )
 
 const metaServiceQuery = "_services._dns-sd._udp"
+const airServiceQuery = "_airnode._udp"
 const scanTimeout = 3 * time.Second
 
 func DiscoverServiceTypes(ctx context.Context) []string {
@@ -40,6 +41,41 @@ func DiscoverServiceTypes(ctx context.Context) []string {
 	wg.Wait()
 
 	return types
+}
+
+func ScanAirNodes(ctx context.Context) ([]Node, error) {
+	entriesChannel := make(chan *mdns.ServiceEntry, 64)
+	var nodes []Node
+	var wg sync.WaitGroup
+
+	wg.Go(func() {
+		for entry := range entriesChannel {
+			nodes = append(nodes, Node{
+				Name:   entry.Name,
+				Host:   entry.Host,
+				AddrV4: entry.AddrV4.String(),
+				AddrV6: entry.AddrV6.String(),
+				Port:   entry.Port,
+				Info:   entry.Info,
+				// Service: svcType,
+			})
+		}
+	})
+
+	params := mdns.DefaultParams(airServiceQuery)
+	params.Entries = entriesChannel
+	params.DisableIPv6 = false
+	params.Timeout = scanTimeout
+
+	err := mdns.Query(params)
+	if err != nil {
+		return nil, err
+	}
+
+	close(entriesChannel)
+	wg.Wait()
+
+	return nodes, nil
 }
 
 func ScanAllServices(ctx context.Context, types []string) []Node {
