@@ -7,15 +7,14 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
-	"github.com/hashicorp/mdns"
+	"github.com/grandcat/zeroconf"
 	"github.com/tg4-dev/air/src/internal/discovery"
 )
 
 func main() {
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	sigs := make(chan os.Signal, 1)
@@ -26,23 +25,18 @@ func main() {
 		log.Fatalf("Cannot get hostname: %s", err)
 	}
 
-	mdnsService, err := mdns.NewMDNSService(hostname, "_airnode._udp", "", "", 12345, nil, []string{"info=test"})
+	server, err := zeroconf.Register(hostname, "_airnode._udp", "local.", 12345, []string{"info=test"}, nil)
 	if err != nil {
 		log.Fatalf("Cannot create mdnsService: %s", err)
 	}
+	defer server.Shutdown()
 
-	isRunning := true
-
-	mdnsServer, err := mdns.NewServer(&mdns.Config{Zone: mdnsService})
-	if err != nil {
-		log.Fatalf("Cannot create mdnsServer: %s", err)
-	}
-	defer mdnsServer.Shutdown()
-	for isRunning {
+	for {
 		select {
 		case <-sigs:
 			fmt.Println("Shutting down...")
-			isRunning = false
+			cancel()
+			return
 		default:
 			nodes, err := discovery.ScanAirNodes(ctx)
 			if err != nil {
