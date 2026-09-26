@@ -14,6 +14,7 @@ import (
 )
 
 func main() {
+
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -25,7 +26,7 @@ func main() {
 		log.Fatalf("Cannot get hostname: %s", err)
 	}
 
-	mdnsService, err := mdns.NewMDNSService(hostname, "_airnode._tcp", "", "", 12345, nil, []string{"info=test"})
+	mdnsService, err := mdns.NewMDNSService(hostname, "_airnode._udp", "", "", 12345, nil, []string{"info=test"})
 	if err != nil {
 		log.Fatalf("Cannot create mdnsService: %s", err)
 	}

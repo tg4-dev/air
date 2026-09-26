@@ -2,6 +2,8 @@ package discovery
 
 import (
 	"context"
+	"net"
+	"runtime"
 	"sync"
 	"time"
 
@@ -67,6 +69,13 @@ func ScanAirNodes(ctx context.Context) ([]Node, error) {
 	params.DisableIPv6 = false
 	params.Timeout = scanTimeout
 
+	if runtime.GOOS == "darwin" {
+		iface, err := net.InterfaceByName("en0")
+		if err != nil {
+			return nil, err
+		}
+		params.Interface = iface
+	}
 	err := mdns.Query(params)
 	if err != nil {
 		return nil, err
