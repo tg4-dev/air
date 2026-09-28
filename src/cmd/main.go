@@ -12,6 +12,16 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	browser := discovery.Browser{}
+	node, err := discovery.NewNode()
+	fmt.Println(node)
+	if err != nil {
+		panic(err)
+	}
+	advertiser, err := discovery.NewAdvertiser(*node)
+	if err != nil {
+		panic(err)
+	}
+	defer advertiser.Shutdown()
 
 	browser.Update(ctx)
 	peers := browser.GetPeers()
