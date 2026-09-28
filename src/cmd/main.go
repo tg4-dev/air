@@ -18,7 +18,7 @@ func main() {
 	defer cancel()
 	browser := discovery.Browser{}
 	node, err := discovery.NewNode()
-	fmt.Println(node)
+	fmt.Printf("%+v\n", node)
 	if err != nil {
 		panic(err)
 	}
@@ -31,8 +31,11 @@ func main() {
 	browser.Update(ctx)
 	peers := browser.GetPeers()
 
-	fmt.Println(peers)
+	fmt.Println("===== PEERS =====")
+	for _, peer := range peers {
+		fmt.Printf("%+v\n", peer)
+	}
 
 	<-sigs
-	fmt.Printf("Shutting down...")
+	fmt.Println("Shutting down")
 }
