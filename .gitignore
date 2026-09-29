@@ -1,0 +1,25 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Tests
+*.test
+
+# Coverage
+*.out
+*.prof
+coverage.txt
+
+# Envs
+.env
+.env.local
+
+# Other
+bin/
+dist/
+*.log
+.DS_Store
+.cache
