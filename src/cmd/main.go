@@ -24,7 +24,7 @@ func main() {
 	browser := discovery.Browser{}
 	logger.Info("Browser successfully created")
 	node, err := discovery.NewNode()
-	fmt.Printf("%+v\n", node)
+	logger.Debug("Created node", node)
 	if err != nil {
 		panic(err)
 	}
