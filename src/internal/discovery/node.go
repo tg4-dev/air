@@ -18,10 +18,12 @@ func NewNode() (*Node, error) {
 	}
 	// TODO: fill Addrs and Meta
 	return &Node{self: Endpoint{
-		ID:    uuid.New().String(),
-		Name:  hostname,
-		Addrs: nil,
-		Port:  12345,
-		Meta:  nil,
-	}, peers: nil}, nil
+			ID:    uuid.New().String(),
+			Name:  hostname,
+			Addrs: nil,
+			Port:  12345,
+			Meta:  nil,
+		},
+			peers: nil},
+		nil
 }

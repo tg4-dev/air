@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/grandcat/zeroconf"
+	"github.com/tg4-dev/air/src/internal/utils"
 )
 
 type Advertiser struct {
@@ -19,7 +20,7 @@ func NewAdvertiser(node Node) (*Advertiser, error) {
 		return nil, err
 	}
 
-	iface, err := getActiveInterface()
+	iface, err := utils.GetActiveInterface()
 	if err != nil {
 		return nil, err
 	}
@@ -36,31 +37,4 @@ func NewAdvertiser(node Node) (*Advertiser, error) {
 
 func (a *Advertiser) Shutdown() {
 	a.server.Shutdown()
-}
-
-func getActiveInterface() (*net.Interface, error) {
-	ifaces, err := net.Interfaces()
-	if err != nil {
-		return nil, err
-	}
-	for _, iface := range ifaces {
-		if iface.Flags&net.FlagUp == 0 {
-			continue
-		}
-
-		if iface.Flags&net.FlagLoopback != 0 {
-			continue
-		}
-
-		if iface.Flags&net.FlagMulticast == 0 {
-			continue
-		}
-
-		addrs, _ := iface.Addrs()
-		if len(addrs) == 0 {
-			continue
-		}
-		return &iface, nil
-	}
-	return nil, fmt.Errorf("no suitable ifaces found")
 }
