@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/google/uuid"
+	"github.com/tg4-dev/air/src/internal/utils"
 )
 
 type Node struct {
@@ -16,11 +17,20 @@ func NewNode() (*Node, error) {
 	if err != nil {
 		return nil, err
 	}
-	// TODO: fill Addrs and Meta
+	// TODO: fill Meta
+	iface, err := utils.GetActiveInterface()
+	if err != nil {
+		return nil, err
+	}
+	ips, err := utils.GetIpsFromInterface(iface)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Node{self: Endpoint{
 			ID:    uuid.New().String(),
 			Name:  hostname,
-			Addrs: nil,
+			Addrs: ips,
 			Port:  12345,
 			Meta:  nil,
 		},

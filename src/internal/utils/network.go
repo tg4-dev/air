@@ -5,7 +5,7 @@ import (
 	"net"
 )
 
-func getActiveInterface() (*net.Interface, error) {
+func GetActiveInterface() (*net.Interface, error) {
 	ifaces, err := net.Interfaces()
 	if err != nil {
 		return nil, err
@@ -30,4 +30,21 @@ func getActiveInterface() (*net.Interface, error) {
 		return &iface, nil
 	}
 	return nil, fmt.Errorf("no suitable ifaces found")
+}
+
+func GetIpsFromInterface(iface *net.Interface) ([]net.IP, error) {
+	addrs, err := iface.Addrs()
+	if err != nil {
+		return nil, err
+	}
+	var ips []net.IP
+	for _, addr := range addrs {
+		ipNet, ok := addr.(*net.IPNet)
+		if ok {
+			var ip net.IP = ipNet.IP
+			ips = append(ips, ip)
+		}
+	}
+
+	return ips, nil
 }
