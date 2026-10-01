@@ -3,12 +3,11 @@ package discovery
 import (
 	"os"
 
-	"github.com/google/uuid"
 	"github.com/tg4-dev/air/src/internal/utils"
 )
 
 type Node struct {
-	self  Endpoint
+	self  Endpoint `json:"self"`
 	peers []Peer
 }
 
@@ -27,13 +26,10 @@ func NewNode() (*Node, error) {
 		return nil, err
 	}
 
-	return &Node{self: Endpoint{
-			ID:    uuid.New().String(),
-			Name:  hostname,
-			Addrs: ips,
-			Port:  12345,
-			Meta:  nil,
-		},
-			peers: nil},
-		nil
+	endpoint, err := NewEndpoint(hostname, ips, 12345, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Node{self: *endpoint, peers: nil}, nil
 }
