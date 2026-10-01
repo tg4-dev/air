@@ -33,3 +33,15 @@ func NewNode() (*Node, error) {
 
 	return &Node{self: *endpoint, peers: nil}, nil
 }
+
+func (n *Node) ID() string {
+	return n.self.ID
+}
+
+func (n *Node) Hostname() string {
+	return n.self.Name
+}
+
+func (n *Node) Port() int {
+	return n.self.Port
+}
