@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/tg4-dev/air/src/internal/discovery"
+	"github.com/tg4-dev/air/src/internal/engines"
 	"github.com/tg4-dev/air/src/internal/nodeinfo"
 	"github.com/tg4-dev/air/src/internal/utils"
 )
@@ -30,14 +31,20 @@ func main() {
 		os.Exit(1)
 	}
 
-	provider := nodeinfo.NewDefaultProvider(node.ID(), node.Hostname(), startedAt)
-	infoServer := nodeinfo.NewServer(provider)
+	statusProvider := nodeinfo.NewStatusProvider(node.ID(), node.Hostname(), startedAt)
+	infoServer := nodeinfo.NewServer(statusProvider)
 	addr := ":" + strconv.Itoa(node.Port())
 	if err := infoServer.Start(addr); err != nil {
 		logger.Error("failed to start nodeinfo HTTP server", "addr", addr, "err", err)
 		os.Exit(1)
 	}
 	logger.Info("nodeinfo HTTP server listening", "addr", addr)
+
+	// TODO should be filled with config json
+	working_engine_name := "ollama"
+	// TODO should be able to return error
+	engine := engines.WorkingEngine(working_engine_name)
+	engine.TestRequest()
 
 	advertiser, err := discovery.NewAdvertiser(*node)
 	if err != nil {
