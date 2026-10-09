@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// TODO fetch port from config
 const ollamaBaseURL = "http://127.0.0.1:11434"
 
 type ollamaTagsResponse struct {
@@ -21,6 +22,7 @@ type ollamaModel struct {
 func ProbeOllama(ctx context.Context) EngineStatus {
 	status := EngineStatus{
 		Name:      "ollama",
+		Port:      "11434", // TODO
 		Available: false,
 		Models:    []ModelInfo{},
 	}
@@ -58,3 +60,9 @@ func ProbeOllama(ctx context.Context) EngineStatus {
 	}
 	return status
 }
+
+type ollamaEngine struct {
+	port string
+}
+
+func (e *ollamaEngine) TestRequest() {}

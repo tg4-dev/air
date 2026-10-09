@@ -4,7 +4,7 @@ type EngineStatus struct {
 	Name      string      `json:"name"`
 	Port      string      `json:"port"` // TODO should be fetched from config
 	Available bool        `json:"available"`
-	IsDefault bool        `json:"is_default"`
+	IsWorking bool        `json:"is_working"`
 	Models    []ModelInfo `json:"models"`
 }
 

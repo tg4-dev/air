@@ -45,7 +45,7 @@ func TestHandleStatus(t *testing.T) {
 		UptimeSeconds:   42,
 		GPU:             GPUInfo{Name: "unknown"},
 		Engines: []engines.EngineStatus{
-			{Name: "ollama", Port: "8080", Available: false, IsDefault: true, Models: []engines.ModelInfo{}},
+			{Name: "ollama", Port: "11434", Available: false, IsWorking: true, Models: []engines.ModelInfo{}},
 		},
 	}
 	s := NewServer(&fakeProvider{status: want})

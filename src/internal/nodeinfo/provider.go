@@ -48,6 +48,7 @@ func (p *statusProvider) CurrentStatus(ctx context.Context) NodeStatus {
 		Hostname:        p.Hostname,
 		UptimeSeconds:   int64(time.Since(p.StartedAt).Seconds()),
 		GPU:             GPUInfo{Name: gpuName},
+		WorkingEngine:   engineList[0].Name, // TODO
 		Engines:         engineList,
 	}
 }

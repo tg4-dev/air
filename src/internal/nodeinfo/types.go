@@ -11,4 +11,5 @@ type NodeStatus struct {
 	UptimeSeconds   int64                  `json:"uptime_seconds"`
 	GPU             GPUInfo                `json:"gpu"`
 	Engines         []engines.EngineStatus `json:"engines"`
+	WorkingEngine   string                 `json:"working_engine_name"`
 }
