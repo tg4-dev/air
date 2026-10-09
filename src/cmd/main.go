@@ -30,8 +30,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	provider := nodeinfo.NewDefaultProvider(node.ID(), node.Hostname(), startedAt)
-	infoServer := nodeinfo.NewServer(provider)
+	statusProvider := nodeinfo.NewStatusProvider(node.ID(), node.Hostname(), startedAt)
+	infoServer := nodeinfo.NewServer(statusProvider)
 	addr := ":" + strconv.Itoa(node.Port())
 	if err := infoServer.Start(addr); err != nil {
 		logger.Error("failed to start nodeinfo HTTP server", "addr", addr, "err", err)

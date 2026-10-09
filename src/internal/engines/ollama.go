@@ -1,4 +1,4 @@
-package nodeinfo
+package engines
 
 import (
 	"context"
@@ -18,7 +18,7 @@ type ollamaModel struct {
 	Size int64  `json:"size"`
 }
 
-func probeOllama(ctx context.Context) EngineStatus {
+func ProbeOllama(ctx context.Context) EngineStatus {
 	status := EngineStatus{
 		Name:      "ollama",
 		Available: false,

@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/tg4-dev/air/src/internal/engines"
 )
 
 type fakeProvider struct {
@@ -42,8 +44,8 @@ func TestHandleStatus(t *testing.T) {
 		Hostname:        "test-host",
 		UptimeSeconds:   42,
 		GPU:             GPUInfo{Name: "unknown"},
-		Engines: []EngineStatus{
-			{Name: "ollama", Available: false, Models: []ModelInfo{}},
+		Engines: []engines.EngineStatus{
+			{Name: "ollama", Port: "8080", Available: false, IsDefault: true, Models: []engines.ModelInfo{}},
 		},
 	}
 	s := NewServer(&fakeProvider{status: want})
