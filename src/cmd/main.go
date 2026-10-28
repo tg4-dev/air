@@ -5,72 +5,22 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"strconv"
 	"syscall"
-	"time"
 
-	"github.com/tg4-dev/air/src/internal/discovery"
-	"github.com/tg4-dev/air/src/internal/engines"
-	"github.com/tg4-dev/air/src/internal/nodeinfo"
-	"github.com/tg4-dev/air/src/internal/utils"
+	"github.com/tg4-dev/air/src/internal/app"
 )
 
 func main() {
-	logger := utils.NewLogger()
-	startedAt := time.Now()
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
 
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	node, err := discovery.NewNode()
+	a, err := app.New()
 	if err != nil {
-		logger.Error("failed to create node", "err", err)
+		fmt.Fprintln(os.Stderr, "failed to init app:", err)
 		os.Exit(1)
 	}
-
-	statusProvider := nodeinfo.NewStatusProvider(node.ID(), node.Hostname(), startedAt)
-	infoServer := nodeinfo.NewServer(statusProvider)
-	addr := ":" + strconv.Itoa(node.Port())
-	if err := infoServer.Start(addr); err != nil {
-		logger.Error("failed to start nodeinfo HTTP server", "addr", addr, "err", err)
+	if err := a.Run(ctx); err != nil {
+		fmt.Fprintln(os.Stderr, "app error:", err)
 		os.Exit(1)
-	}
-	logger.Info("nodeinfo HTTP server listening", "addr", addr)
-
-	// TODO should be filled with config json
-	working_engine_name := "ollama"
-	// TODO should be able to return error
-	engine := engines.WorkingEngine(working_engine_name)
-	engine.TestRequest()
-
-	advertiser, err := discovery.NewAdvertiser(*node)
-	if err != nil {
-		logger.Error("failed to start mDNS advertiser", "err", err)
-		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
-		_ = infoServer.Shutdown(shutdownCtx)
-		shutdownCancel()
-		os.Exit(1)
-	}
-	defer advertiser.Shutdown()
-
-	browser := discovery.Browser{}
-	browser.Update(ctx)
-	peers := browser.GetPeers()
-
-	fmt.Println("===== PEERS =====")
-	for _, peer := range peers {
-		fmt.Printf("%+v\n", peer)
-	}
-
-	<-sigs
-	logger.Info("shutting down")
-
-	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer shutdownCancel()
-	if err := infoServer.Shutdown(shutdownCtx); err != nil {
-		logger.Error("nodeinfo HTTP shutdown", "err", err)
 	}
 }
